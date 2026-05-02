@@ -3,13 +3,24 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showFailToast } from 'vant'
 import { fetchNote } from '../api/notes'
-import type { Note } from '../types/domain'
+import type { EnergyScore, Note } from '../types/domain'
 import { formatChineseDate } from '../utils/date'
 
 const route = useRoute()
 const router = useRouter()
 const note = ref<Note | null>(null)
 let timer: number | null = null
+
+function clampEnergy(score: number): EnergyScore {
+  const n = Math.round(Number(score))
+  if (n < 1) return 1
+  if (n > 5) return 5
+  return n as EnergyScore
+}
+
+function energyBarWidthPercent(score: number): string {
+  return `${(clampEnergy(score) / 5) * 100}%`
+}
 
 async function loadDetail() {
   const { data } = await fetchNote(Number(route.params.id))
@@ -48,11 +59,21 @@ onUnmounted(() => {
           <p class="eyebrow">{{ formatChineseDate(note.record_date) }}</p>
           <h1>{{ note.content }}</h1>
           <template v-if="note.ai_ready">
-            <div :class="['energy-scale', `energy-score--${note.energy_score}`]">
-              <span v-for="n in 5" :key="n" :class="{ on: n <= note.energy_score }"></span>
+            <div
+              class="moment-energy-bar detail-page-energy-bar"
+              role="img"
+              :aria-label="`能量 ${clampEnergy(note.energy_score)} / 5`"
+            >
+              <div class="moment-energy-bar__track">
+                <div
+                  class="moment-energy-bar__fill"
+                  :class="`moment-energy-bar__fill--${clampEnergy(note.energy_score)}`"
+                  :style="{ width: energyBarWidthPercent(note.energy_score) }"
+                />
+              </div>
             </div>
             <div class="detail-grid">
-              <div><small>能量刻度</small><strong>{{ note.energy_score }} / 5</strong></div>
+              <div><small>能量刻度</small><strong>{{ clampEnergy(note.energy_score) }} / 5</strong></div>
               <div><small>九宫格板块</small><strong>{{ note.grid_tag }}</strong></div>
             </div>
             <div class="ai-reply">

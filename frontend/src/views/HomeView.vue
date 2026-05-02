@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useFitText } from '../composables/useFitText'
 
 const router = useRouter()
+const heroTitleEl = ref<HTMLElement | null>(null)
+useFitText(heroTitleEl)
 
 function goAuth(mode: 'login' | 'register') {
   router.push({ name: 'auth', query: { mode } })
@@ -12,7 +16,7 @@ function goAuth(mode: 'login' | 'register') {
   <div class="phone-shell public-shell home-page">
     <section class="hero-panel">
       <p class="eyebrow">念响</p>
-      <h1>把每天的心事，轻轻放回自己身边</h1>
+      <h1 ref="heroTitleEl" class="fit-text-title">把每天的心事，轻轻放回自己身边</h1>
       <p class="subtitle">
         念想陪你随手记录、随心分享，也有阿响像朋友一样回应你，帮你看见那些没来得及照顾的情绪。
       </p>

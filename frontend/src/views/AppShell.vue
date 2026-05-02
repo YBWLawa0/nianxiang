@@ -12,7 +12,7 @@ const active = computed({
 </script>
 
 <template>
-  <div class="phone-shell app-shell">
+  <div class="phone-shell app-shell" :class="{ 'app-shell--mine': route.name === 'mine' }">
     <!-- Desktop Sidebar -->
     <aside class="desktop-sidebar">
       <div class="sidebar-logo">Echoes</div>
@@ -38,7 +38,10 @@ const active = computed({
     <!-- Main Content -->
     <main
       class="shell-main"
-      :class="{ 'shell-main--record': route.name === 'record' }"
+      :class="{
+        'shell-main--record': route.name === 'record',
+        'shell-main--mine': route.name === 'mine',
+      }"
     >
       <router-view />
     </main>

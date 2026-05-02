@@ -19,6 +19,18 @@ const router = createRouter({
     },
     { path: '/notes/:id', name: 'note-detail', component: () => import('../views/NoteDetailView.vue'), meta: { requiresAuth: true } },
     { path: '/diaries/:id', name: 'diary-detail', component: () => import('../views/DiaryDetailView.vue'), meta: { requiresAuth: true } },
+    {
+      path: '/analysis/weekly/:id',
+      name: 'weekly-report-detail',
+      component: () => import('../views/WeeklyReportDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/podcast/:id',
+      name: 'podcast-player',
+      component: () => import('../views/PodcastPlayerView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

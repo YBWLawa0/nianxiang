@@ -364,6 +364,7 @@ function endVoice(explicitCancel = false) {
           v-for="note in notesForTimeline"
           :key="note.id"
           class="timeline-item timeline-note-wrap"
+          :class="{ 'timeline-note-wrap--delete-open': activeDeleteId === note.id }"
           :data-note-id="String(note.id)"
           @pointerdown="onNotePointerDown(note)"
           @pointerup="onNotePointerUp"

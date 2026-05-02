@@ -3,8 +3,9 @@ from __future__ import annotations
 import asyncio
 import json
 from collections.abc import AsyncIterator
-from datetime import date
+from datetime import date, datetime
 from typing import TypedDict
+from zoneinfo import ZoneInfo
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -132,18 +133,23 @@ class DiaryState(TypedDict):
     generated: DiaryGeneration | None
 
 
+# 随笔 created_at 存 UTC；给模型看的时间要换到用户常用时区，避免东八区凌晨在提示里显示成「前一天」。
+_USER_TZ = ZoneInfo("Asia/Shanghai")
+
 DIARY_BODY_RULES = """日记正文须遵守：
-- 用户第一人称，用「我」叙述，不要用「你」称呼用户。
-- 抓住当天一条核心叙事，不要流水账堆砌。
-- 只保留关键情感节点与事件转折，删去琐碎重复。
-- 还原用户表达，仅做润色与衔接，不增添情节或心理戏。
-- 禁止虚构时间/历史概括：不得编造「三年来」「一直」「从未」等，除非当天随笔原文明确写过。"""
+- 用户第一人称视角，用「我」不用「你」。
+- 抓住当天核心叙事，不要流水账。
+- 只保留关键情感节点和事件转折。
+- 还原用户表达，只润色不加戏。
+- 禁止虚构时间/历史：不得编造「三年来」「一直」「从未」等，除非用户当天随笔中明确说过。
+- 若文中提到具体时刻，以当天随笔里标注的东八区记录时间为准，勿按 UTC 或数据库原始时间误写日期。"""
 
 STREAM_DIARY_BODY_SYSTEM = f"""你是“阿响”，把用户当天的随笔整理成第一人称日记正文。
 
 {DIARY_BODY_RULES}
 
 自然、有情绪，不要写成总结报告；不编造事实；只输出正文，不要 JSON/标题/Markdown 标题。
+每条随笔前的记录时间为东八区（北京时间），与首行「日期」应为同一日历日。
 分段可用空行。"""
 
 STREAM_AXIANG_OBSERVATION_SYSTEM = f"""你是「阿响」。你要写一段「阿响观察」，**只依据下面给出的当天能量记录**（用户原始碎碎念、时间、能量分、板块标签、以及当时你对这条随笔的短回应）。那是唯一数据源——**不要**依据任何已经整理好的日记正文，也不要编造用户没写过的情节。
@@ -178,8 +184,8 @@ async def stream_axiang_observation(diary_date: date, notes: list[Note]) -> Asyn
     """基于当日随笔（能量记录）流式输出「阿响观察」，与日记正文独立。"""
     llm = _llm_streaming_body()
     human = (
-        f"日期：{diary_date}\n"
-        f"以下为当天能量记录（唯一依据）：\n{_notes_prompt(notes)}"
+        f"日期（用户日历日）：{diary_date}\n"
+        f"以下为当天能量记录（记录时间为东八区，唯一依据）：\n{_notes_prompt(notes)}"
     )
     fb = _fallback_axiang_observation(diary_date, notes)
     if llm is None:
@@ -200,8 +206,8 @@ async def stream_daily_ritual(diary_date: date, notes: list[Note]) -> AsyncItera
     """流式输出：今日一问 + 温暖鼓励（同一板块连续正文）。"""
     llm = _llm_streaming_body()
     human = (
-        f"日期：{diary_date}\n"
-        f"以下为当天能量记录（供你把握节奏与主题，勿复述流水账）：\n{_notes_prompt(notes)}"
+        f"日期（用户日历日）：{diary_date}\n"
+        f"以下为当天能量记录（记录时间为东八区；供你把握节奏与主题，勿复述流水账）：\n{_notes_prompt(notes)}"
     )
     fb = _fallback_daily_ritual(diary_date, notes)
     if llm is None:
@@ -282,7 +288,7 @@ async def stream_diary_plain_body(diary_date: date, notes: list[Note]) -> AsyncI
             await asyncio.sleep(0.018)
         return
 
-    human = f'日期：{diary_date}\n当天随笔：\n{_notes_prompt(notes)}'
+    human = f'日期（用户日历日）：{diary_date}\n当天随笔（记录时间为东八区）：\n{_notes_prompt(notes)}'
     messages = [SystemMessage(content=STREAM_DIARY_BODY_SYSTEM), HumanMessage(content=human)]
     async for chunk in llm.astream(messages):
         piece = _message_chunk_text(chunk)
@@ -319,11 +325,22 @@ def derive_diary_title_summary(content: str, diary_date: date, notes: list[Note]
     return fb.title, fb.summary
 
 
+def _note_local_time_str(created_at: datetime) -> str:
+    dt = created_at
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    local = dt.astimezone(_USER_TZ)
+    return local.strftime("%Y年%m月%d日 %H:%M")
+
+
 def _notes_prompt(notes: list[Note]) -> str:
     lines = []
     for item in notes:
+        t = _note_local_time_str(item.created_at) if item.created_at else ""
         lines.append(
-            f"- {item.created_at}: {item.content}\n  能量: {item.energy_score}/5；板块: {item.grid_tag}；阿响当时的回应: {item.ai_comment}"
+            f"- 归属日 {item.record_date} · 记录时间（东八区）{t}\n"
+            f"  正文：{item.content}\n"
+            f"  能量: {item.energy_score}/5；板块: {item.grid_tag}；阿响当时的回应: {item.ai_comment}"
         )
     return "\n".join(lines)
 
@@ -361,7 +378,7 @@ def generate_diary(diary_date: date, notes: list[Note]) -> DiaryGeneration:
 2. 保留当天真实事件和心情起伏，可以有停顿、犹豫和温柔的自我对话；紧扣核心叙事，避免流水账。
 3. 不要编造具体事实或时间跨度定性。
 4. 输出 JSON，字段为 title、summary、content。"""
-        human = f'日期：{state["diary_date"]}\n当天随笔：\n{_notes_prompt(state["notes"])}'
+        human = f'日期（用户日历日）：{state["diary_date"]}\n当天随笔（记录时间为东八区）：\n{_notes_prompt(state["notes"])}'
         response = llm.invoke([SystemMessage(content=system), HumanMessage(content=human)])
         try:
             generated = DiaryGeneration.model_validate(_json_from_message(str(response.content)))

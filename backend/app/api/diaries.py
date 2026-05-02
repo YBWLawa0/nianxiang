@@ -1,5 +1,6 @@
 import json
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -26,13 +27,18 @@ from app.services.ai import (
 router = APIRouter()
 
 
+def _calendar_today_shanghai() -> date:
+    """与前端 todayString()（本地日）对齐：未传 diary_date 时用东八区日历日，避免服务跑在 UTC 时「差一天」。"""
+    return datetime.now(ZoneInfo("Asia/Shanghai")).date()
+
+
 def _sse_payload(obj: dict) -> str:
     return f"data: {json.dumps(obj, ensure_ascii=False)}\n\n"
 
 
 @router.post("/generate", response_model=DiaryRead)
 def generate_today_diary(payload: DiaryGenerateRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> Diary:
-    diary_date = payload.diary_date or date.today()
+    diary_date = payload.diary_date or _calendar_today_shanghai()
     notes = list(
         db.scalars(
             select(Note)
@@ -75,7 +81,7 @@ async def generate_diary_stream(
     current_user: User = Depends(get_current_user),
 ) -> StreamingResponse:
     """SSE：先写入占位日记拿到 id，再流式输出正文，结束后生成标题与摘要并落库。"""
-    diary_date = payload.diary_date or date.today()
+    diary_date = payload.diary_date or _calendar_today_shanghai()
     notes = list(
         db.scalars(
             select(Note)

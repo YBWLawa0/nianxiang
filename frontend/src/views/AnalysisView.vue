@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '../components/PageHeader.vue'
+import { podcastsNewestFirst } from '../data/monthlyPodcasts'
+
+const router = useRouter()
 
 type AnalysisTab = 'week' | 'month' | 'year'
 
@@ -19,8 +23,8 @@ const tabCopy = {
     subtitle: '把一周里的能量起伏、反复出现的人和事，整理成几张可以慢慢翻看的报告。',
   },
   month: {
-    title: '月度播客',
-    subtitle: '像听一封私人电台来信，回放这个月那些被你反复提起的主题和情绪。',
+    title: '播客',
+    subtitle: '全部单集收录于此，按时间从新到旧排列；标题仅标示月份，当期主题在标签中。',
   },
   year: {
     title: '年度书架',
@@ -31,9 +35,12 @@ const tabCopy = {
 const activeCopy = computed(() => tabCopy[activeTab.value])
 const activeEyebrow = computed(() => tabs.find((tab) => tab.key === activeTab.value)?.eyebrow || 'Insight')
 
+const podcastListAll = computed(() => podcastsNewestFirst())
+
 const weeklyReports = [
   {
     id: 1,
+    coverImage: '/图片1.png',
     range: '4月22日 - 4月28日',
     title: '把注意力收回来的七天',
     summary: '你开始更频繁地记录“边界感”和“休息”，焦虑没有消失，但已经能被命名。',
@@ -42,6 +49,7 @@ const weeklyReports = [
   },
   {
     id: 2,
+    coverImage: '/图片2.png',
     range: '4月15日 - 4月21日',
     title: '很多小事在悄悄修复你',
     summary: '散步、热茶和两次认真聊天，让这一周的低谷没有继续向下滑。',
@@ -50,38 +58,12 @@ const weeklyReports = [
   },
   {
     id: 3,
+    coverImage: '/图片3.png',
     range: '4月8日 - 4月14日',
     title: '过载之后的慢速重启',
     summary: '任务密度偏高，身体信号出现得更早。你已经在学习把暂停当成安排的一部分。',
     tags: ['过载', '重启', '计划'],
     pulse: '48%',
-  },
-]
-
-const monthlyPodcasts = [
-  {
-    id: 1,
-    date: '2026.04',
-    duration: '18 min',
-    title: '四月的声音：不再把疲惫藏起来',
-    summary: '本期会从三段随笔开始，聊聊你如何识别消耗、寻找可持续的节奏。',
-    chapters: ['开场独白', '情绪天气', '给下个月的话'],
-  },
-  {
-    id: 2,
-    date: '2026.03',
-    duration: '24 min',
-    title: '三月回放：那些重新发芽的愿望',
-    summary: '你在月底重新提起了创作、朋友和新的生活秩序，它们都还很轻，但已经在场。',
-    chapters: ['愿望清单', '关系片段', '温柔收尾'],
-  },
-  {
-    id: 3,
-    date: '2026.02',
-    duration: '15 min',
-    title: '二月短节目：把冬天慢慢放下',
-    summary: '春节后的节奏切换、家庭对话和迟来的休息，是这个月最常出现的三个关键词。',
-    chapters: ['节奏切换', '家庭回声'],
   },
 ]
 
@@ -116,8 +98,16 @@ const yearlyBooks = [
   },
 ]
 
-function openPlaceholder(target: string) {
-  showToast(`${target}详情页先占位，后续接入`)
+function openWeeklyReport(id: number) {
+  router.push({ name: 'weekly-report-detail', params: { id: String(id) } })
+}
+
+function showYearBookComingSoon(year: string) {
+  showToast(`${year}专属年度书籍即将上线`)
+}
+
+function openPodcast(id: number) {
+  router.push({ name: 'podcast-player', params: { id: String(id) } })
 }
 </script>
 
@@ -144,29 +134,39 @@ function openPlaceholder(target: string) {
         v-for="report in weeklyReports"
         :key="report.id"
         class="analysis-card report-card"
-        @click="openPlaceholder(report.title)"
+        @click="openWeeklyReport(report.id)"
       >
-        <div class="analysis-card__meta">
-          <time>{{ report.range }}</time>
-          <span>{{ report.pulse }}</span>
+        <div class="report-card__cover">
+          <img :src="report.coverImage" :alt="report.title" loading="lazy" decoding="async" />
         </div>
-        <h2>{{ report.title }}</h2>
-        <p>{{ report.summary }}</p>
-        <div class="analysis-tags">
-          <span v-for="tag in report.tags" :key="tag">{{ tag }}</span>
+        <div class="report-card__body">
+          <div class="analysis-card__meta">
+            <time>{{ report.range }}</time>
+            <span>{{ report.pulse }}</span>
+          </div>
+          <h2>{{ report.title }}</h2>
+          <p>{{ report.summary }}</p>
+          <div class="analysis-tags">
+            <span v-for="tag in report.tags" :key="tag">{{ tag }}</span>
+          </div>
         </div>
       </article>
     </div>
 
     <div v-else-if="activeTab === 'month'" class="analysis-stack">
       <article
-        v-for="podcast in monthlyPodcasts"
+        v-for="podcast in podcastListAll"
         :key="podcast.id"
         class="analysis-card podcast-card"
-        @click="openPlaceholder(podcast.title)"
+        @click="openPodcast(podcast.id)"
       >
         <div class="podcast-cover">
-          <span>{{ podcast.date }}</span>
+          <img
+            :src="podcast.coverImage"
+            :alt="podcast.title"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
         <div class="podcast-body">
           <div class="analysis-card__meta">
@@ -175,8 +175,8 @@ function openPlaceholder(target: string) {
           </div>
           <h2>{{ podcast.title }}</h2>
           <p>{{ podcast.summary }}</p>
-          <div class="podcast-chapters">
-            <span v-for="chapter in podcast.chapters" :key="chapter">{{ chapter }}</span>
+          <div class="analysis-tags">
+            <span v-for="tag in podcast.tags" :key="tag">{{ tag }}</span>
           </div>
         </div>
       </article>
@@ -187,7 +187,7 @@ function openPlaceholder(target: string) {
         <article
           class="year-book"
           :class="`year-book--${book.color}`"
-          @click="openPlaceholder(`${book.year} 年度书`)"
+          @click="showYearBookComingSoon(book.year)"
         >
           <span class="year-book__year">{{ book.year }}</span>
           <h2>{{ book.title }}</h2>
