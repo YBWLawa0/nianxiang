@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pymysql
+alembic
+pydantic-settings
+python-jose[cryptography]
+passlib
+python-multipart
+langchain
+langchain-community
+langchain-openai
+langgraph
+dashscope
+email-validator

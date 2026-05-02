@@ -1,0 +1,72 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDE / Editor ---
+.idea/
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/extensions.json
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Environment：所有名为 .env 的本地配置；保留 .env.example 模板 ---
+**/.env
+**/.env.*
+!**/.env.example
+
+# --- Node.js / 前端 ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# --- Python / 后端 ---
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+# 虚拟环境：整棵目录树均忽略，由各自本地 python -m venv .venv 创建
+#（含无尾斜杠写法，避免个别工具只匹配「名为 .venv 的路径」时漏网）
+.venv
+**/.venv
+backend/.venv
+venv
+**/venv
+# 虚拟环境目录（不写裸的 env/，避免个别环境下与 .env 混淆）
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# --- Tests / coverage ---
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# --- Build ---
+build/
+*.egg
+
+# --- 本地数据库文件（若使用 SQLite 等）---
+*.db
+*.sqlite3
+
+# --- 缓存 ---
+.cache/
