@@ -29,6 +29,7 @@ button { border: 0; cursor: pointer; }
 .phone-shell { position: relative; min-height: 100vh; max-width: 520px; margin: 0 auto; background: linear-gradient(180deg, rgba(255,250,241,.92), rgba(246,239,228,.98)); box-shadow: 0 0 80px rgba(45, 37, 27, .14); }
 .phone-shell::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .45; background-image: linear-gradient(rgba(31,59,45,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(31,59,45,.025) 1px, transparent 1px); background-size: 28px 28px; }
 .shell-main { height: 100vh; padding-bottom: 76px; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.shell-main--record { background: #ffffff; }
 .page-pad { padding: 26px 18px 96px; }
 .input-page { padding-bottom: 128px; }
 .page-header { padding: 10px 2px 22px; }
@@ -80,16 +81,128 @@ h2 { font-size: 20px; }
 .ai-reply { margin-top: 14px; line-height: 1.8; }
 .draft-hint { margin-top: 16px; padding: 14px; border-radius: 20px; background: rgba(255,255,255,.42); color: var(--muted); line-height: 1.7; }
 
-.moments-page { padding-left: 16px; padding-right: 16px; }
+/* 随笔详情（非日记）：与记录页同色系，不改变版式 */
+.detail-page:not(.diary-detail) {
+  --record-gold: #c5a028;
+  --record-ink: #1a1a1a;
+  color: var(--record-ink);
+}
+.detail-page:not(.diary-detail) .eyebrow { color: var(--record-gold); }
+.detail-page:not(.diary-detail) .detail-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.detail-page:not(.diary-detail) .detail-card h1 { color: var(--record-ink); }
+.detail-page:not(.diary-detail) .detail-grid div,
+.detail-page:not(.diary-detail) .ai-reply,
+.detail-page:not(.diary-detail) .draft-hint {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.detail-page:not(.diary-detail) .detail-grid small,
+.detail-page:not(.diary-detail) .ai-reply small,
+.detail-page:not(.diary-detail) .draft-hint small { color: rgba(90, 90, 88, 0.75); }
+.detail-page:not(.diary-detail) .energy-scale span { background: rgba(0, 0, 0, 0.08); }
+.detail-page:not(.diary-detail) .energy-scale span.on {
+  background: linear-gradient(90deg, #d4af37, var(--record-gold));
+}
+.detail-page:not(.diary-detail) .draft-hint,
+.detail-page:not(.diary-detail) .draft-hint p { color: rgba(90, 90, 88, 0.88); }
+.detail-page:not(.diary-detail) .ai-reply p { color: var(--record-ink); }
+.detail-page:not(.diary-detail) .van-nav-bar__title { color: var(--record-ink); }
+
+/* 随笔墙：保留头像 + 正文的朋友圈栅格，配色与 .record-page 一致 */
+.moments-page {
+  padding-left: 16px;
+  padding-right: 16px;
+  --record-gold: #c5a028;
+  --record-gold-soft: rgba(197, 160, 40, 0.35);
+  --record-ink: #1a1a1a;
+  --record-btn: #141414;
+  background: #ffffff;
+  color: var(--record-ink);
+  min-height: calc(100vh - 76px);
+  min-height: calc(100dvh - 76px);
+}
 .moments-page .page-header { padding-bottom: 18px; }
+.moments-page .page-header .eyebrow { color: var(--record-gold); }
+.moments-page .subtitle { color: #5c5c5a; }
+.moments-page .empty-state {
+  min-height: 192px;
+  background: transparent;
+  border: none;
+  color: rgba(90, 90, 88, 0.6);
+  font-size: 14px;
+  font-style: italic;
+}
+.moments-page .empty-state span {
+  color: rgba(90, 90, 88, 0.6);
+  font-size: 14px;
+  font-weight: normal;
+}
 .moment-card { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 14px 2px 18px; margin-bottom: 0; border-bottom: 1px solid rgba(70, 53, 38, 0.08); background: transparent; text-align: left; }
+.moments-page .moment-card { border-bottom-color: rgba(0, 0, 0, 0.06); }
 .avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 16px; background: var(--leaf); color: #fffaf1; font-family: 'Noto Serif SC', 'Microsoft YaHei', serif; }
+.moments-page .avatar {
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(197, 160, 40, 0.14), rgba(197, 160, 40, 0.06));
+  color: #9b7b16;
+  border: 1px solid rgba(197, 160, 40, 0.18);
+}
 .avatar.large { width: 68px; height: 68px; border-radius: 24px; font-size: 28px; }
 .moment-author, .comment-author { color: #53688e; font-weight: 700; }
+.moments-page .moment-author { color: var(--record-ink); }
 .moment-body p { margin: 6px 0 10px; line-height: 1.72; color: #2f2a22; }
-.moment-meta { justify-content: flex-start; margin-top: 6px; }
+.moments-page .moment-body p { color: var(--record-ink); font-size: 14px; line-height: 1.625; }
+.moments-page .moment-top span:not(.moment-author) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(90, 90, 88, 0.7);
+}
+.moment-meta { justify-content: flex-start; align-items: center; margin-top: 6px; gap: 10px; flex-wrap: wrap; }
+.moments-page .moment-energy-bar {
+  flex: 1;
+  min-width: 72px;
+  max-width: 168px;
+}
+.moments-page .moment-energy-bar__track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.moments-page .moment-energy-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.28s ease;
+}
+/* 能量条填充色：1 深红 → 5 深绿 */
+.moments-page .moment-energy-bar__fill--1 { background: #9a1428; }
+.moments-page .moment-energy-bar__fill--2 { background: #e57373; }
+.moments-page .moment-energy-bar__fill--3 { background: #e6b000; }
+.moments-page .moment-energy-bar__fill--4 { background: #9ccc65; }
+.moments-page .moment-energy-bar__fill--5 { background: #1b5e20; }
+.moments-page .moment-grid-tag {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(197, 160, 40, 0.12);
+  color: var(--record-ink);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+}
 .comment { position: relative; margin-top: 12px; padding: 10px 12px; border-radius: 4px; background: rgba(91, 84, 76, .15); color: #3a332d; line-height: 1.65; font-size: 14px; }
+.moments-page .comment {
+  border-radius: 12px;
+  background: rgba(197, 160, 40, 0.055);
+  border: 1px solid rgba(197, 160, 40, 0.08);
+  color: var(--record-ink);
+}
 .comment::before { content: ''; position: absolute; top: -6px; left: 14px; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 7px solid rgba(91, 84, 76, .15); }
+.moments-page .comment::before {
+  border-bottom-color: rgba(197, 160, 40, 0.08);
+}
+.moments-page .comment-author { color: var(--record-gold); }
 
 .generate-card { width: 100%; min-height: 128px; margin-bottom: 18px; padding: 22px; text-align: left; color: white; border-radius: 30px; background: radial-gradient(circle at 90% 0%, #e5a06e, transparent 38%), linear-gradient(135deg, #1f3b2d, #6b7f5c); box-shadow: var(--shadow); }
 .generate-card span { display: block; font-size: 24px; margin-bottom: 10px; }
@@ -181,6 +294,254 @@ h2 { font-size: 20px; }
 .auth-hero .subtitle { animation-delay: 0.3s; }
 .auth-card.standalone { animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards; }
 .auth-footnote { animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards; }
+
+/* ========== 记录页 Record — 白底 + 金色点缀 + 黑底白字按钮（仅作用于 .record-page） ========== */
+.record-page {
+  --record-gold: #c5a028;
+  --record-gold-soft: rgba(197, 160, 40, 0.35);
+  --record-ink: #1a1a1a;
+  --record-btn: #141414;
+  --record-btn-text: #ffffff;
+  background: #ffffff;
+  color: var(--record-ink);
+  min-height: calc(100vh - 76px);
+  min-height: calc(100dvh - 76px);
+}
+.record-page .page-header .eyebrow {
+  color: var(--record-gold);
+}
+.record-page .timeline-wrap {
+  min-height: calc(100vh - 280px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-left: 16px;
+}
+.record-page .timeline-list {
+  gap: 24px;
+  border-left: 1px solid var(--record-gold-soft);
+  padding-left: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.record-page .timeline-item {
+  position: relative;
+}
+.record-page .timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -21px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #d4af37, var(--record-gold));
+  box-shadow: 0 0 0 4px #ffffff;
+}
+.record-page .timeline-note-wrap {
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+.record-page .note-snippet {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.record-page .snippet-time {
+  font-size: 12px;
+  color: rgba(90, 90, 88, 0.7);
+  margin-bottom: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.record-page .subtitle {
+  color: #5c5c5a;
+}
+.record-page .snippet-content {
+  line-height: 1.625;
+  color: var(--record-ink);
+  font-size: 14px;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  -webkit-box-orient: unset;
+}
+.record-page .empty-state {
+  min-height: 192px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  color: rgba(90, 90, 88, 0.6);
+  font-size: 14px;
+  font-style: italic;
+  background: transparent;
+  border: none;
+}
+.record-page .empty-state span {
+  color: rgba(90, 90, 88, 0.6);
+  font-size: 14px;
+  font-weight: normal;
+}
+.record-page .empty-state small {
+  display: none;
+}
+
+.note-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  background: #ffffff;
+  color: #2c2c2a;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e6e4df;
+  padding: 4px;
+  min-width: 120px;
+  margin-top: 4px;
+}
+.note-dropdown-item {
+  padding: 12px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 8px;
+}
+.note-dropdown-item:active {
+  background: #f5f5f5;
+}
+
+.record-page .voice-draft {
+  scroll-margin-bottom: 20px;
+  scroll-margin-top: 12px;
+}
+.record-page .voice-draft .note-snippet {
+  opacity: 0.7;
+}
+.record-page .voice-draft--cancel .note-snippet {
+  color: #b85c4a;
+}
+.record-page .voice-draft-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.record-page .composer {
+  bottom: calc(var(--van-tabbar-height, 50px) + constant(safe-area-inset-bottom) + 12px);
+  bottom: calc(var(--van-tabbar-height, 50px) + env(safe-area-inset-bottom) + 12px);
+  width: calc(min(520px, 100vw) - 32px);
+  padding: 8px;
+  align-items: flex-end;
+  gap: 8px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+}
+.record-page .composer:focus-within {
+  box-shadow: 0 0 0 2px var(--record-gold-soft);
+}
+.record-page .mode-btn,
+.record-page .send-btn,
+.record-page .voice-hold {
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 0;
+}
+.record-page .mode-btn {
+  width: 44px;
+  min-width: 44px;
+  background: var(--record-btn);
+  color: var(--record-btn-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.record-page .mode-btn:active {
+  background: #000000;
+}
+.record-page .mode-btn-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  flex-shrink: 0;
+}
+.record-page .composer textarea {
+  flex: 1;
+  resize: none;
+  border: none;
+  border-radius: 0;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 12px 12px;
+  line-height: 20px;
+  font-size: 14px;
+  color: var(--record-ink);
+  background: transparent;
+  outline: none;
+}
+.record-page .composer textarea::placeholder {
+  color: rgba(90, 90, 88, 0.5);
+}
+.record-page .send-btn {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: var(--record-btn);
+  color: var(--record-btn-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.record-page .send-btn:disabled {
+  background: #e8e8e6;
+  color: #9a9a98;
+  cursor: not-allowed;
+  opacity: 1;
+}
+.record-page .send-btn:not(:disabled):active {
+  background: #000000;
+}
+.record-page .voice-hold {
+  flex: 1;
+  background: var(--record-btn);
+  color: var(--record-btn-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 12px;
+}
+.record-page .voice-hold:active:not(.recording) {
+  background: #000000;
+}
+.record-page .voice-hold.recording {
+  background: var(--record-btn);
+  color: var(--record-btn-text);
+  transform: scale(0.98);
+  border-radius: 12px;
+}
+.record-page .voice-hold.voice-hold--cancel {
+  background: #b85c4a;
+  color: #fffaf1;
+  border-radius: 12px;
+}
 
 @media (min-width: 700px) {
   body { padding: 22px 0; }

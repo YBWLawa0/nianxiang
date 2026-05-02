@@ -40,7 +40,7 @@ onUnmounted(() => {
 
 <template>
   <div class="phone-shell">
-    <main class="shell-main">
+    <main class="shell-main shell-main--record">
       <section class="detail-page page-pad">
         <van-nav-bar title="随笔详情" left-text="返回" left-arrow @click-left="router.back()" />
         <van-skeleton v-if="!note" title :row="5" />
@@ -48,7 +48,7 @@ onUnmounted(() => {
           <p class="eyebrow">{{ formatChineseDate(note.record_date) }}</p>
           <h1>{{ note.content }}</h1>
           <template v-if="note.ai_ready">
-            <div class="energy-scale">
+            <div :class="['energy-scale', `energy-score--${note.energy_score}`]">
               <span v-for="n in 5" :key="n" :class="{ on: n <= note.energy_score }"></span>
             </div>
             <div class="detail-grid">
@@ -56,13 +56,13 @@ onUnmounted(() => {
               <div><small>九宫格板块</small><strong>{{ note.grid_tag }}</strong></div>
             </div>
             <div class="ai-reply">
-              <small>数字分身想对你说</small>
+              <small>阿响想对你说</small>
               <p>{{ note.ai_comment }}</p>
             </div>
           </template>
           <div v-else class="draft-hint">
-            <small>这条随笔正在生成 AI 分析</small>
-            <p>草稿已保存，稍后会自动补充能量刻度、九宫格标签和 AI 评语。</p>
+            <small>阿响正在为你分析这条随笔</small>
+            <p>草稿已保存，稍后会自动补充能量刻度、九宫格标签和阿响的评语。</p>
           </div>
         </article>
       </section>

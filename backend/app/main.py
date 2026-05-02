@@ -2,11 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, notes, diaries
 from app.core.config import get_settings
-from app.db.session import Base, engine
+from app.db.session import Base, engine, ensure_diary_columns
 import app.models  # noqa: F401
 
 settings = get_settings()
 Base.metadata.create_all(bind=engine)
+ensure_diary_columns(engine)
 
 app = FastAPI(title=settings.app_name)
 app.add_middleware(

@@ -57,7 +57,7 @@ def list_notes(date: date | None = None, db: Session = Depends(get_db), current_
     query = select(Note).where(Note.user_id == current_user.id)
     if date is not None:
         query = query.where(Note.record_date == date)
-    query = query.order_by(Note.created_at.asc())
+    query = query.order_by(Note.created_at.desc())
     return list(db.scalars(query).all())
 
 
@@ -67,3 +67,12 @@ def get_note(note_id: int, db: Session = Depends(get_db), current_user: User = D
     if note is None or note.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="随笔不存在")
     return note
+
+
+@router.delete("/{note_id}", status_code=204)
+def delete_note(note_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)) -> None:
+    note = db.get(Note, note_id)
+    if note is None or note.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="随笔不存在")
+    db.delete(note)
+    db.commit()

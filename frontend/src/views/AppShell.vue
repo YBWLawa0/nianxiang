@@ -13,7 +13,10 @@ const active = computed({
 
 <template>
   <div class="phone-shell">
-    <main class="shell-main">
+    <main
+      class="shell-main"
+      :class="{ 'shell-main--record': route.name === 'record' || route.name === 'moments' }"
+    >
       <router-view />
     </main>
     <van-tabbar v-model="active" route class="bottom-nav" active-color="#1f3b2d" inactive-color="#9c8f84">
