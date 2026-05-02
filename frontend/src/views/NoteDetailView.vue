@@ -40,7 +40,7 @@ onUnmounted(() => {
 
 <template>
   <div class="phone-shell">
-    <main class="shell-main shell-main--record">
+    <main class="shell-main">
       <section class="detail-page page-pad">
         <van-nav-bar title="随笔详情" left-text="返回" left-arrow @click-left="router.back()" />
         <van-skeleton v-if="!note" title :row="5" />
