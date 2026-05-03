@@ -14,6 +14,8 @@ class Diary(Base):
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     summary: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    axiang_observation: Mapped[str] = mapped_column(Text, nullable=False, default='')
+    daily_ritual: Mapped[str] = mapped_column(Text, nullable=False, default='')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 

@@ -34,5 +34,9 @@ export interface Diary {
   title: string
   summary: string
   content: string
+  /** 阿响观察（旧接口可能缺省，按空串处理） */
+  axiang_observation?: string
+  /** 今日一问与收尾鼓励 */
+  daily_ritual?: string
   created_at: string
 }

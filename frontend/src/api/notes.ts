@@ -12,3 +12,7 @@ export function fetchNotes(params?: { date?: string }) {
 export function fetchNote(id: number) {
   return api.get<Note>(`/notes/${id}`)
 }
+
+export function deleteNote(id: number) {
+  return api.delete(`/notes/${id}`)
+}

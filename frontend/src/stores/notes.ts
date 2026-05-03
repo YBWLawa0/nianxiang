@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { createNote as createNoteApi, fetchNotes } from '../api/notes'
+import { createNote as createNoteApi, deleteNote as deleteNoteApi, fetchNotes } from '../api/notes'
 import type { Note } from '../types/domain'
 import { todayString } from '../utils/date'
 
@@ -30,9 +30,14 @@ export const useNoteStore = defineStore('notes', () => {
 
   async function create(content: string) {
     const { data } = await createNoteApi(content, todayString())
-    notes.value = [...notes.value, data]
+    notes.value = [data, ...notes.value]
     return data
   }
 
-  return { notes, loading, loadToday, loadAll, create }
+  async function remove(id: number) {
+    await deleteNoteApi(id)
+    notes.value = notes.value.filter((n) => n.id !== id)
+  }
+
+  return { notes, loading, loadToday, loadAll, create, remove }
 })

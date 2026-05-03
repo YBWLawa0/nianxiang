@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useFitText } from '../composables/useFitText'
 
 const router = useRouter()
+const heroTitleEl = ref<HTMLElement | null>(null)
+useFitText(heroTitleEl)
 
 function goAuth(mode: 'login' | 'register') {
   router.push({ name: 'auth', query: { mode } })
@@ -11,10 +15,10 @@ function goAuth(mode: 'login' | 'register') {
 <template>
   <div class="phone-shell public-shell home-page">
     <section class="hero-panel">
-      <p class="eyebrow">Nianxiang</p>
-      <h1>把每天的心事，轻轻放回自己身边</h1>
+      <p class="eyebrow">念响</p>
+      <h1 ref="heroTitleEl" class="fit-text-title">把每天的心事，轻轻放回自己身边</h1>
       <p class="subtitle">
-        念想陪你随手记录、随心分享，也用像朋友一样的 AI 回应，帮你看见那些没来得及照顾的情绪。
+        念想陪你随手记录、随心分享，也有阿响像朋友一样回应你，帮你看见那些没来得及照顾的情绪。
       </p>
       <div class="hero-actions">
         <button class="primary-action" @click="goAuth('register')">开始记录今天</button>
@@ -32,9 +36,9 @@ function goAuth(mode: 'login' | 'register') {
       </article>
 
       <article class="story-card ai-sample">
-        <div class="avatar">念</div>
+        <div class="avatar">响</div>
         <div>
-          <strong>念想 AI</strong>
+          <strong>阿响</strong>
           <p>我听见你今天很累，也听见你还愿意为一点光停下来。先不用急着变好，能感觉到自己，就已经很珍贵。</p>
         </div>
       </article>
@@ -49,7 +53,7 @@ function goAuth(mode: 'login' | 'register') {
       <article class="home-card">
         <span>02</span>
         <h2>给每段随笔一个温度</h2>
-        <p>AI 会生成能量刻度、九宫格标签和亲近的评语，不把你分析成冷冰冰的数据。</p>
+        <p>阿响会为你生成能量刻度、九宫格标签和亲近的评语，不把你分析成冷冰冰的数据。</p>
       </article>
       <article class="home-card diary-preview">
         <span>03</span>
